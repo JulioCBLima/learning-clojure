@@ -116,7 +116,7 @@
 (describe-autoscaling-groups nil)
 ;; => {:Value "0", :Next 1}
 
-(describe-autoscaling-groups 3 nil)
+(describe-autoscaling-groups 1 nil)
 ;; => {:Value "3", :Next 4}
 
 (describe-autoscaling-groups 5 nil)
@@ -126,8 +126,11 @@
   ([]
    (lazy-describe-paginated-autoscaling-groups nil))
   ([next-token]
-   (let [response (describe-autoscaling-groups next-token)]
-     (cons response (lazy-seq (lazy-describe-paginated-autoscaling-groups (-> response :Next)))))))
+   (let [response (describe-autoscaling-groups next-token nil)]
+     (cons response (lazy-seq (lazy-describe-paginated-autoscaling-groups (:Next response)))))))
+
+(take 3 (lazy-describe-paginated-autoscaling-groups))
+;; => ({:Value "0", :Next 1} {:Value "1", :Next 2} {:Value "2", :Next 3})
 
 (reduce #(let [acc (cons %2 %1)]
            (if (some? (:Next %2))
@@ -135,4 +138,10 @@
              (reduced acc)))
         []
         (lazy-describe-paginated-autoscaling-groups))
+;; => ({:Value "5", :Next nil}
+;;     {:Value "4", :Next 5}
+;;     {:Value "3", :Next 4}
+;;     {:Value "2", :Next 3}
+;;     {:Value "1", :Next 2}
+;;     {:Value "0", :Next 1})
 
