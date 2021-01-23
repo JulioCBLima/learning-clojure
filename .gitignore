@@ -18,4 +18,5 @@ vendor
 .calva
 playground.clj
 .hgignore
-
+.clj-kondo
+.lsp
