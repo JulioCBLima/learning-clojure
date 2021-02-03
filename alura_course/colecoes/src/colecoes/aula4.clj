@@ -61,3 +61,12 @@ resumo
 
 (top-2 resumo)
 ;; => ({:usuario-id 16, :total-de-pedidos 3, :gasto-total 840} {:usuario-id 15, :total-de-pedidos 3, :gasto-total 840})
+
+(filter #(> (:gasto-total %) 600) resumo)
+;; => ({:usuario-id 16, :total-de-pedidos 3, :gasto-total 840} {:usuario-id 15, :total-de-pedidos 3, :gasto-total 840})
+
+(some #(> (:gasto-total %) 600) resumo)
+;; => true
+ 
+(not (empty? (filter #(> (:gasto-total %) 600) resumo)))
+;; => true
