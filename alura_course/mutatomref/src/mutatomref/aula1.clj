@@ -38,3 +38,22 @@ hospital
 ;; => {:espera <-("222" "333")-<, :laboratorio1 <-()-<, :laboratorio2 <-()-<, :laboratorio3 <-("555")-<}
 
 ;; ^ mutacao de variável com root binding
+
+(def hospital (h.logic/chega-em hospital :espera "666"))
+hospital
+;; => {:espera <-("222" "333" "666")-<, :laboratorio1 <-()-<, :laboratorio2 <-()-<, :laboratorio3 <-("555")-<}
+
+(def hospital (h.logic/chega-em hospital :espera "777"))
+hospital
+;; => {:espera <-("222" "333" "666" "777")-<, :laboratorio1 <-()-<, :laboratorio2 <-()-<, :laboratorio3 <-("555")-<}
+
+(def hospital (h.logic/chega-em hospital :espera "888"))
+hospital
+;; => {:espera <-("222" "333" "666" "777" "888")-<, :laboratorio1 <-()-<, :laboratorio2 <-()-<, :laboratorio3 <-("555")-<}
+
+(def hospital (h.logic/chega-em hospital :espera "999"))
+;; Execution Error (ExceptionInfo) Fila já está cheia
+
+
+;; --------------
+
