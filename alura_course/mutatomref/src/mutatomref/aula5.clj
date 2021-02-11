@@ -19,6 +19,15 @@
     (pprint @hospital)
     
     (transfere! hospital :espera :laboratorio1)
+    (pprint @hospital)
+    
+    (transfere! hospital :espera :laboratorio2)
+    (pprint @hospital)
+    
+    (transfere! hospital :espera :laboratorio2)
+    (pprint @hospital)
+    
+    (transfere! hospital :laboratorio2 :laboratorio3)
     (pprint @hospital)))
 
 (testa-transferencia)
