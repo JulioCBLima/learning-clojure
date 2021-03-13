@@ -97,6 +97,20 @@
                     (adiciona-visita 20 ["01/02/2019" "01/01/2020"])
                     (adiciona-visita 15 ["01/03/2019"]))]
   (imprime-relatorio-de-paciente visitas guilherme))
-;; => ; Execution error (ExceptionInfo) at schemas.aula1/eval16310$imprime-relatorio-de-paciente (REPL:83).
+;; Execution error (ExceptionInfo) at schemas.aula1/eval16310$imprime-relatorio-de-paciente (REPL:83).
 ;; Input to imprime-relatorio-de-paciente does not match schema: 
 ;; [nil (named (not (instance? java.lang.Long a-clojure.lang.PersistentArrayMap)) paciente)]
+
+(s/defn novo-paciente
+  [id :- Long
+   nome :- s/Str]
+  {:id id
+   :nome nome})
+
+(novo-paciente 15 "Guilherme")
+;; => {:id 15, :nome "Guilherme"}
+
+(novo-paciente "Guilherme" 15)
+;; Execution error (ExceptionInfo) at schemas.aula1/eval16456$novo-paciente (REPL:104).
+;; Input to novo-paciente does not match schema: 
+;; [(named (not (instance? java.lang.Long "Guilherme")) id) (named (not (instance? java.lang.String 15)) nome)]
