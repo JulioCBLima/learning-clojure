@@ -89,3 +89,97 @@
 ; Execution error (ExceptionInfo) at schemas.aula2/eval16496$novo-paciente (REPL:74).
 ; Input to novo-paciente does not match schema: 
 ; [(named (not (instance? java.lang.Number "15")) id) nil]
+
+(novo-paciente 14 "julio")
+
+;; --------------------
+
+(defn estritamente-positivo?
+  [x]
+  (> x 0))
+
+(def EstritamentePositivo (s/pred estritamente-positivo?))
+
+(s/validate EstritamentePositivo 15)
+;; => 15
+
+(s/validate EstritamentePositivo 0)
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: (not (schemas.aula2/estritamente-positivo? 0))
+
+(s/validate EstritamentePositivo -15)
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: (not (schemas.aula2/estritamente-positivo? -15))
+
+(def EstritamentePositivoV2 (s/pred estritamente-positivo? 'estritamente-positivo))
+
+(s/validate EstritamentePositivoV2 -15)
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: (not (estritamente-positivo -15))
+
+;; -------------------
+(def PacienteV2
+  "Schema de um paciente"
+  {:id (s/constrained s/Int estritamente-positivo?)
+   :nome s/Str})
+
+(s/validate PacienteV2 {:id 15
+                        :nome "guilherme"})
+;; => {:id 15, :nome "guilherme"}
+
+(s/validate PacienteV2 {:id 0
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (schemas.aula2/estritamente-positivo? 0))}
+
+(s/validate PacienteV2 {:id -15
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (schemas.aula2/estritamente-positivo? -15))}
+
+(def PacienteV3
+  "Schema de um paciente"
+  {:id (s/constrained s/Int pos-int?)
+   :nome s/Str})
+
+(s/validate PacienteV3 {:id 15
+                        :nome "guilherme"})
+;; => {:id 15, :nome "guilherme"}
+
+(s/validate PacienteV3 {:id 0
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (schemas.aula2/estritamente-positivo? 0))}
+
+(s/validate PacienteV3 {:id -15
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (schemas.aula2/estritamente-positivo? -15))}
+
+(def PacienteV4
+  "Schema de um paciente"
+  {:id (s/constrained s/Int #(> % 0))
+   :nome s/Str})
+
+(s/validate PacienteV4 {:id 15
+                        :nome "guilherme"})
+;; => {:id 15, :nome "guilherme"}
+
+(s/validate PacienteV4 {:id 0
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (schemas.aula2/fn--8848 0))}
+
+(def PacienteV5
+  "Schema de um paciente"
+  {:id (s/constrained s/Int #(> % 0) 'estritamente-positivo)
+   :nome s/Str})
+
+(s/validate PacienteV5 {:id 15
+                        :nome "guilherme"})
+;; => {:id 15, :nome "guilherme"}
+
+(s/validate PacienteV5 {:id 0
+                        :nome "guilherme"})
+; Execution error (ExceptionInfo) at schema.core/validator$fn (core.clj:155).
+; Value does not match schema: {:id (not (estritamente-positivo 0))}
