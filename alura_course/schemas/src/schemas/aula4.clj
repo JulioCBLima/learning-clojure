@@ -57,3 +57,10 @@
                          16 daniela}))
 ;; => {15 {:id 15, :nome "Guilherme", :plano [:raio-x]}, 16 {:id 15, :nome "Guilherme", :plano [:raio-x]}}
 
+;; ---------------
+
+(def Visita s/Str)
+
+(def Visitas
+  {PosInt [Visita]})
+
