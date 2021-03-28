@@ -23,3 +23,12 @@
   
   (testing "Que ... quando o departamento não existe"
     (is (nil? (cabe-na-fila? {:espera [1 2 3 4]} :raio-x)))))
+
+(deftest chega-em-test
+
+  (testing "aceita pessoas enquanto cabem pessoas na fila"
+    (is (= {:espera [1 2 3 4 5]}
+           (chega-em {:espera [1 2 3 4]} :espera 5)))
+    
+    (is (= {:espera [1 2 5]}
+           (chega-em {:espera [1 2]} :espera 5)))))

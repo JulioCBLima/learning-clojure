@@ -7,3 +7,6 @@
           count
           (< 5))) ; (not= 5); => bug
 
+(defn chega-em
+  [hospital departamento pessoa]
+  (update hospital departamento conj pessoa))
