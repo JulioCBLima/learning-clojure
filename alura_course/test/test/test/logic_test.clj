@@ -31,4 +31,8 @@
            (chega-em {:espera [1 2 3 4]} :espera 5)))
     
     (is (= {:espera [1 2 5]}
-           (chega-em {:espera [1 2]} :espera 5)))))
+           (chega-em {:espera [1 2]} :espera 5))))
+  
+  (testing "não aceita quando não cabe na fila"
+    (is (thrown? clojure.lang.ExceptionInfo
+                 (chega-em {:espera [1 35 42 64 21]} :espera 76)))))
