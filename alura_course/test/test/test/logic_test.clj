@@ -35,4 +35,11 @@
   
   (testing "não aceita quando não cabe na fila"
     (is (thrown? clojure.lang.ExceptionInfo
-                 (chega-em {:espera [1 35 42 64 21]} :espera 76)))))
+                 (chega-em {:espera [1 35 42 64 21]} :espera 76))))
+  
+  (testing "não aceita quando não cabe na fila"
+    (is (try
+          (chega-em {:espera [1 35 42 64 21]} :espera 76)
+          false
+          (catch clojure.lang.ExceptionInfo e
+            (= :impossivel-colocar-pessoa-na-fila (:tipo (ex-data e))))))))

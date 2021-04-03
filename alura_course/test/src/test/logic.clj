@@ -11,5 +11,7 @@
   [hospital departamento pessoa]
   (if (cabe-na-fila? hospital departamento)
     (update hospital departamento conj pessoa)
-    (throw (ex-info "Não cabe ninguém neste departamento" {:paciente pessoa}))))
+    (throw (ex-info "Não cabe ninguém neste departamento" 
+                    {:paciente pessoa
+                     :tipo :impossivel-colocar-pessoa-na-fila}))))
 ;; ^ não é uma boa jogar uma exception genérica para tratar erros
