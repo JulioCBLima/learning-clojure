@@ -1,4 +1,6 @@
-(ns test.logic)
+(ns test.logic
+  (:require [test.model :as model]
+            [schema.core :as s]))
 
 (defn cabe-na-fila?
   [hospital departamento]
@@ -21,18 +23,22 @@
                      :tipo :impossivel-colocar-pessoa-na-fila}))))
 ; ^ antes de fazer swap chega-em vai ter que tratar o resultado
 
-(defn atende
-  [hospital departamento]
+(s/defn atende :- model/Hospital
+  [hospital :- model/Hospital
+   departamento :- model/DepartamentoId]
   (update hospital departamento pop))
 
-(defn proxima
-  [hospital departamento]
+(s/defn proxima :- model/PacienteId
+  [hospital :- model/Hospital
+   departamento :- model/DepartamentoId]
   (-> hospital
       departamento
       peek))
 
-(defn transfere
-  [hospital de para]
+(s/defn transfere :- model/Hospital
+  [hospital :- model/Hospital
+   de :- model/DepartamentoId
+   para :- model/DepartamentoId]
   (let [pessoa (proxima hospital de)]
     (-> hospital
         (atende de)

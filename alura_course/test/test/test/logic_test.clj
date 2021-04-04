@@ -1,5 +1,6 @@
 (ns test.logic-test
   (:require [clojure.test :refer :all]
+            [schema.core :as s]
             [test.logic :as logic]
             [test.model :as model]))
 
@@ -48,24 +49,25 @@
 
 (deftest transfere-teste
   (testing "aceita pessoas se cabe"
-    (let [hospital-original {:espera [5]
-                             :raio-x []}]
-      (is (= {:espera []
-              :raio-x [5]}
-             (logic/transfere hospital-original
-                              :espera
-                              :raio-x))))
-    (let [hospital-original {:espera (conj model/fila-vazia 51 5)
-                             :raio-x (conj model/fila-vazia 13)}]
-      (is (= {:espera [5]                       ; -> comparando vetor com fila
-              :raio-x [13 51]}
-             (logic/transfere hospital-original
-                              :espera
-                              :raio-x)))))
-  
+    (s/with-fn-validation
+      (let [hospital-original {:espera (conj model/fila-vazia 5)
+                               :raio-x model/fila-vazia}]
+        (is (= {:espera []
+                :raio-x [5]}
+               (logic/transfere hospital-original
+                                :espera
+                                :raio-x))))
+      (let [hospital-original {:espera (conj model/fila-vazia 51 5)
+                               :raio-x (conj model/fila-vazia 13)}]
+        (is (= {:espera [5]
+                :raio-x [13 51]}
+               (logic/transfere hospital-original
+                                :espera
+                                :raio-x))))))
+
   (testing "recusa pessoa se não cabe"
-    (let [hospital-cheio {:espera [5]
-                          :raio-x [1 2 52 42 13]}]
+    (let [hospital-cheio {:espera (conj model/fila-vazia 5)
+                          :raio-x (conj model/fila-vazia 1 2 52 42 13)}]
       (is (thrown? clojure.lang.ExceptionInfo
                    (logic/transfere hospital-cheio
                                     :espera
