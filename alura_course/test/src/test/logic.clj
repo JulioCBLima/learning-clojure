@@ -14,10 +14,26 @@
 
 (defn chega-em
   [hospital departamento pessoa]
-  (if-let [novo-hospital (tenta-colocar-na-fila hospital departamento pessoa)]
-    {:hospital novo-hospital
-     :resultado :sucesso}
-    {:hospital hospital
-     :resultado :impossivel-colocar-pessoa-na-fila}))
+  (if (cabe-na-fila? hospital departamento)
+    (update hospital departamento conj pessoa)
+    (throw (ex-info "Não cabe ninguém neste departamento" 
+                    {:paciente pessoa
+                     :tipo :impossivel-colocar-pessoa-na-fila}))))
 ; ^ antes de fazer swap chega-em vai ter que tratar o resultado
 
+(defn atende
+  [hospital departamento]
+  (update hospital departamento pop))
+
+(defn proxima
+  [hospital departamento]
+  (-> hospital
+      departamento
+      peek))
+
+(defn transfere
+  [hospital de para]
+  (let [pessoa (proxima hospital de)]
+    (-> hospital
+        (atende de)
+        (chega-em para pessoa))))
