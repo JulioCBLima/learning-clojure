@@ -25,18 +25,18 @@
     (is (nil? (cabe-na-fila? {:espera [1 2 3 4]} :raio-x)))))
 
 (deftest chega-em-test
+    (testing "aceita pessoas enquanto cabem pessoas na fila"
+      (is (= {:hospital {:espera [1 2 3 4 5]}
+              :resultado :sucesso}
+             (chega-em {:espera [1 2 3 4]} :espera 5)))
 
-  (testing "aceita pessoas enquanto cabem pessoas na fila"
-    (is (= {:hospital {:espera [1 2 3 4 5]} 
-            :resultado :sucesso}
-           (chega-em {:espera [1 2 3 4]} :espera 5)))
-    
-    (is (= {:hospital {:espera [1 2 5]}
-            :resultado :sucesso}
-           (chega-em {:espera [1 2]} :espera 5))))
-  
-  (testing "não aceita quando não cabe na fila"
-    (is (= {:hospital {:espera [1 35 42 64 21]}
-            :resultado :impossivel-colocar-pessoa-na-fila}
-           (chega-em {:espera [1 35 42 64 21]} :espera 76)))))
+      (is (= {:hospital {:espera [1 2 5]}
+              :resultado :sucesso}
+             (chega-em {:espera [1 2]} :espera 5))))
+
+    (testing "não aceita quando não cabe na fila"
+      (let [hospital-cheio {:espera [1 35 42 64 21]}]
+        (is (= {:hospital hospital-cheio
+                :resultado :impossivel-colocar-pessoa-na-fila}
+               (chega-em hospital-cheio :espera 76))))))
   

@@ -19,3 +19,5 @@
      :resultado :sucesso}
     {:hospital hospital
      :resultado :impossivel-colocar-pessoa-na-fila}))
+; ^ antes de fazer swap chega-em vai ter que tratar o resultado
+
