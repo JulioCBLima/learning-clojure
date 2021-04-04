@@ -7,11 +7,15 @@
           count
           (< 5))) ; (not= 5); => bug
 
+(defn- tenta-colocar-na-fila
+  [hospital departamento pessoa]
+  (when (cabe-na-fila? hospital departamento)
+    (update hospital departamento conj pessoa)))
+
 (defn chega-em
   [hospital departamento pessoa]
-  (if (cabe-na-fila? hospital departamento)
-    (update hospital departamento conj pessoa)
-    (throw (ex-info "Não cabe ninguém neste departamento" 
-                    {:paciente pessoa
-                     :tipo :impossivel-colocar-pessoa-na-fila}))))
-;; ^ não é uma boa jogar uma exception genérica para tratar erros
+  (if-let [novo-hospital (tenta-colocar-na-fila hospital departamento pessoa)]
+    {:hospital novo-hospital
+     :resultado :sucesso}
+    {:hospital hospital
+     :resultado :impossivel-colocar-pessoa-na-fila}))
