@@ -39,6 +39,8 @@
   [hospital :- model/Hospital
    de :- model/DepartamentoId
    para :- model/DepartamentoId]
+  {:pre [(contains? hospital de)
+         (contains? hospital para)]}
   (let [pessoa (proxima hospital de)]
     (-> hospital
         (atende de)

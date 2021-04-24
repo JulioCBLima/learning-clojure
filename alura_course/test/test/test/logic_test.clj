@@ -74,6 +74,22 @@
                                     :raio-x)))))
   
   (testing "Não pode invocar transferência sem hospital"
-    (is (thrown? clojure.lang.ExceptionInfo (logic/transfere nil
-                                                             :espera
-                                                             :raio-x)))))
+    (is (thrown? AssertionError (logic/transfere nil
+                                                 :espera
+                                                 :raio-x))))
+  
+  (testing "logic/transfere não aceita filas inexistentes como 'de'"
+    (s/with-fn-validation
+      (let [hospital {:espera (conj model/fila-vazia 5)
+                      :raio-x (conj model/fila-vazia 1 2 52)}]
+        (is (thrown? AssertionError (logic/transfere hospital
+                                                     :nao-existe
+                                                     :raio-x))))))
+  
+  (testing "logic/transfere não aceita filas inexistentes como 'para'"
+    (s/with-fn-validation
+      (let [hospital {:espera (conj model/fila-vazia 5)
+                      :raio-x (conj model/fila-vazia 1 2 52)}]
+        (is (thrown? AssertionError (logic/transfere hospital
+                                                     :espera
+                                                     :nao-existe)))))))
