@@ -71,4 +71,9 @@
       (is (thrown? clojure.lang.ExceptionInfo
                    (logic/transfere hospital-cheio
                                     :espera
-                                    :raio-x))))))
+                                    :raio-x)))))
+  
+  (testing "Não pode invocar transferência sem hospital"
+    (is (thrown? clojure.lang.ExceptionInfo (logic/transfere nil
+                                                             :espera
+                                                             :raio-x)))))
