@@ -26,3 +26,9 @@
   
   (testing "Que ... quando o departamento não existe"
     (is (nil? (logic/cabe-na-fila? {:espera [1 2 3 4]} :raio-x)))))
+
+(deftest chega-em-test
+  (testing "Que é colocada uma pessoa em filas menores que 5"
+    (doseq [fila (gen/sample (gen/vector gen/string-alphanumeric 0 4) 10)
+            pessoa (gen/sample gen/string-alphanumeric)]
+      )))
