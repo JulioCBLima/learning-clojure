@@ -45,16 +45,27 @@
 (def fila-nao-cheia-gen
   (gen/fmap
    vetor->fila
-   (gen/vector nome-aleatorio 1 4)))
+   (gen/vector nome-aleatorio 0 4)))
+
+(defn transfere-ignorando-erro [hospital para]
+  (try
+    (logic/transfere hospital :espera para)
+    (catch clojure.lang.ExceptionInfo e
+      (cond
+        (= :fila-cheia (:type (ex-data e))) hospital
+        :else (throw e))
+      )
+    (catch java.lang.AssertionError _e
+      hospital)))
 
 (defspec transfere-tem-que-manter-a-quantidade-de-pessoas 10
-  (prop/for-all [espera fila-nao-cheia-gen
+  (prop/for-all [espera (gen/fmap vetor->fila (gen/vector nome-aleatorio 0 10))
                  raio-x fila-nao-cheia-gen
                  ultrasom fila-nao-cheia-gen
-                 vai-para (gen/elements [:raio-x :ultrasom])]
+                 vai-para (gen/vector (gen/elements [:raio-x :ultrasom]) 10 50)]
     (let [hospital-inicial {:espera espera
                             :raio-x raio-x
                             :ultrasom ultrasom}
-          hospital-final   (logic/transfere hospital-inicial :espera vai-para)]
+          hospital-final   (reduce transfere-ignorando-erro hospital-inicial vai-para)]
       (is (= (logic/total-de-pacientes hospital-inicial)
              (logic/total-de-pacientes hospital-final))))))

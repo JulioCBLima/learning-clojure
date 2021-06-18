@@ -20,7 +20,8 @@
     (update hospital departamento conj pessoa)
     (throw (ex-info "Não cabe ninguém neste departamento" 
                     {:paciente pessoa
-                     :tipo :impossivel-colocar-pessoa-na-fila}))))
+                     :tipo :impossivel-colocar-pessoa-na-fila
+                     :type :fila-cheia}))))
 ; ^ antes de fazer swap chega-em vai ter que tratar o resultado
 
 (s/defn atende :- model/Hospital
