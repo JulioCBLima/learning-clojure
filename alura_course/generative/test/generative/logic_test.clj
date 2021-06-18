@@ -3,7 +3,9 @@
             [schema.core :as s]
             [generative.logic :as logic]
             [generative.model :as model]
-            [clojure.test.check.generators :as gen]))
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]
+            [clojure.test.check.clojure-test :refer [defspec]]))
 
 (deftest cabe-na-fila-test?
   (testing "Que cabe numa fila vazia"
@@ -27,8 +29,32 @@
   (testing "Que ... quando o departamento não existe"
     (is (nil? (logic/cabe-na-fila? {:espera [1 2 3 4]} :raio-x)))))
 
-(deftest chega-em-test
-  (testing "Que é colocada uma pessoa em filas menores que 5"
-    (doseq [fila (gen/sample (gen/vector gen/string-alphanumeric 0 4) 10)
-            pessoa (gen/sample gen/string-alphanumeric)]
-      )))
+(defspec coloca-uma-pessoa-em-filas-menores-que-5 10
+  (prop/for-all [fila (gen/vector gen/string-alphanumeric 0 4)
+                 pessoa gen/string-alphanumeric]
+    (is (= {:espera (conj fila pessoa)}
+           (logic/chega-em {:espera fila} :espera pessoa)))))
+
+(def nome-aleatorio 
+  (gen/fmap clojure.string/join
+    (gen/vector gen/char-alphanumeric 5 10)))
+
+(defn vetor->fila [vetor]
+  (reduce conj model/fila-vazia vetor))
+
+(def fila-nao-cheia-gen
+  (gen/fmap
+   vetor->fila
+   (gen/vector nome-aleatorio 1 4)))
+
+(defspec transfere-tem-que-manter-a-quantidade-de-pessoas 10
+  (prop/for-all [espera fila-nao-cheia-gen
+                 raio-x fila-nao-cheia-gen
+                 ultrasom fila-nao-cheia-gen
+                 vai-para (gen/elements [:raio-x :ultrasom])]
+    (let [hospital-inicial {:espera espera
+                            :raio-x raio-x
+                            :ultrasom ultrasom}
+          hospital-final   (logic/transfere hospital-inicial :espera vai-para)]
+      (is (= (logic/total-de-pacientes hospital-inicial)
+             (logic/total-de-pacientes hospital-final))))))
