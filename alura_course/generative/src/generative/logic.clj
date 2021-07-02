@@ -29,7 +29,7 @@
    departamento :- model/DepartamentoId]
   (update hospital departamento pop))
 
-(s/defn proxima :- model/PacienteId
+(s/defn proxima :- (s/maybe model/PacienteId)
   [hospital :- model/Hospital
    departamento :- model/DepartamentoId]
   (-> hospital
@@ -48,10 +48,11 @@
   {:pre  [(contains? hospital de)
           (contains? hospital para)]
    :post [(mesmo-tamanho? % hospital de para)]}
-  (let [pessoa (proxima hospital de)]
+  (if-let [pessoa (proxima hospital de)]
     (-> hospital
         (atende de)
-        (chega-em para pessoa))))
+        (chega-em para pessoa))
+    hospital))
 
 (defn total-de-pacientes [hospital]
   (->> hospital

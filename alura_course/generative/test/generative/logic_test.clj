@@ -53,12 +53,9 @@
     (catch clojure.lang.ExceptionInfo e
       (cond
         (= :fila-cheia (:type (ex-data e))) hospital
-        :else (throw e))
-      )
-    (catch java.lang.AssertionError _e
-      hospital)))
+        :else (throw e)))))
 
-(defspec transfere-tem-que-manter-a-quantidade-de-pessoas 10
+(defspec transfere-tem-que-manter-a-quantidade-de-pessoas 100
   (prop/for-all [espera (gen/fmap vetor->fila (gen/vector nome-aleatorio 0 10))
                  raio-x fila-nao-cheia-gen
                  ultrasom fila-nao-cheia-gen
