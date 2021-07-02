@@ -1,6 +1,9 @@
 (ns generative.generative
   (:gen-class)
-  (:require [clojure.test.check.generators :as gen]))
+  (:require [clojure.test.check.generators :as gen]
+            [schema-generators.generators :as g]
+            [generative.model :as model]
+            [schema.core :as s]))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -51,3 +54,25 @@
 
 (gen/sample (gen/vector gen/large-integer 4) 4)
 ;; => ([0 -1 -1 -1] [-1 -1 -1 0] [-1 -1 0 0] [-3 1 0 -4])
+
+;;-----------------
+(g/sample 500 model/PacienteId)
+;; => (1 1 15 37 2)
+
+(g/sample 5 model/Departamento)
+;; => (<-()-< <-()-< <-(4)-< <-(16 7 4)-< <-()-<)
+
+(g/sample 5 model/Hospital)
+;; => ({}
+;;     {:xQ <-()-<}
+;;     {:+- <-()-<}
+;;     {:Zr <-(3)-<, :f <-(1 4)-<}
+;;     {:? <-(2 13)-<, :b <-(5 48 14 1)-<, :aZ <-(6 5)-<, :?_r <-(1 7 1 6)-<})
+
+(g/generate model/Hospital)
+;; => {:*U.X <-(3 509)-<,
+;;     :+! <-(6 43 30 2 84 230 134 7)-<,
+;;     :R <-(3 3 472 11 2 3688 236 2 10 396)-<,
+;;     :G:a <-(98 1084)-<,
+;;     :Q <-()-<,
+;;     :P1Q <-(52 178)-<}

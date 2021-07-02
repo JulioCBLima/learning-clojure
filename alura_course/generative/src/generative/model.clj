@@ -1,5 +1,6 @@
 (ns generative.model
-  (:require [schema.core :as s]))
+  (:require [schema.core :as s]
+            [clojure.test.check.generators :as gen]))
 
 (def fila-vazia clojure.lang.PersistentQueue/EMPTY)
 
@@ -10,8 +11,8 @@
    :laboratorio2 fila-vazia
    :laboratorio3 fila-vazia})
 
-(s/def PacienteId (s/pred pos-int? 'inteiro-positivo))
-
+(s/def PacienteId (s/constrained long pos?))
+                         
 (s/def DepartamentoId s/Keyword)
 
 (s/def Departamento (s/queue PacienteId))

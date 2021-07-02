@@ -3,6 +3,7 @@
             [schema.core :as s]
             [generative.logic :as logic]
             [generative.model :as model]
+            [schema-generators.generators :as g]
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop]
             [clojure.test.check.clojure-test :refer [defspec]]))
@@ -66,3 +67,48 @@
           hospital-final   (reduce transfere-ignorando-erro hospital-inicial vai-para)]
       (is (= (logic/total-de-pacientes hospital-inicial)
              (logic/total-de-pacientes hospital-final))))))
+
+(defn adiciona-fila-de-espera [[hospital fila]]
+  (assoc hospital :espera fila))
+
+(def hospital-gen (->> (gen/tuple (gen/not-empty (g/generator model/Hospital))
+                                  fila-nao-cheia-gen)
+                       (gen/fmap adiciona-fila-de-espera)))
+
+(def chega-em-gen
+  (gen/tuple (gen/return logic/chega-em)
+             (gen/return :espera)
+             nome-aleatorio
+             (gen/return 1)))
+
+(defn transfere-gen
+  [hospital]
+  (let [departamentos (keys hospital)]
+    (gen/tuple (gen/return logic/transfere)
+               (gen/elements departamentos)
+               (gen/elements departamentos)
+               (gen/return 0))))
+
+(defn acao-gen 
+  [hospital]
+  (gen/one-of [chega-em-gen (transfere-gen hospital)]))
+
+(defn executa-uma-acao
+  [{:keys [hospital delta] :as situacao} [fn param1 param2 param3]]
+  (try
+    {:hospital (fn hospital param1 param2)
+     :delta (+ delta param3)}
+    (catch clojure.lang.ExceptionInfo _e
+      situacao)))
+
+(defspec simula-um-dia-do-hospita-acumula-pessoas 1
+  (prop/for-all [hospital-inicial hospital-gen]
+    (let [acoes                        (-> (gen/vector (acao-gen hospital-inicial) 1 100)
+                                           gen/not-empty
+                                           gen/generate)
+          situacao-inicial             {:hospital hospital-inicial :delta 0}
+          situacao-final               (reduce executa-uma-acao situacao-inicial acoes)
+          total-de-pacientes-inicial   (logic/total-de-pacientes hospital-inicial)
+          total-de-pacientes-final     (logic/total-de-pacientes (:hospital situacao-final))]
+      (is (>= total-de-pacientes-final total-de-pacientes-inicial))
+      (is (= (- total-de-pacientes-final (:delta situacao-final)) total-de-pacientes-inicial)))))
