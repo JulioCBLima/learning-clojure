@@ -81,12 +81,18 @@
              nome-aleatorio
              (gen/return 1)))
 
+(defn adiciona-inexistente-ao-departamento
+  [departamento]
+  (keyword (str departamento "-inexistente")))
+
 (defn transfere-gen
   [hospital]
-  (let [departamentos (keys hospital)]
+  (let [departamentos              (keys hospital)
+        departamentos-inexistentes (map adiciona-inexistente-ao-departamento departamentos)
+        todos-os-departamentos     (concat departamentos departamentos-inexistentes)]
     (gen/tuple (gen/return logic/transfere)
-               (gen/elements departamentos)
-               (gen/elements departamentos)
+               (gen/elements todos-os-departamentos)
+               (gen/elements todos-os-departamentos)
                (gen/return 0))))
 
 (defn acao-gen 
@@ -99,6 +105,8 @@
     {:hospital (fn hospital param1 param2)
      :delta (+ delta param3)}
     (catch clojure.lang.ExceptionInfo _e
+      situacao)
+    (catch AssertionError _e
       situacao)))
 
 (defspec simula-um-dia-do-hospita-acumula-pessoas 1
