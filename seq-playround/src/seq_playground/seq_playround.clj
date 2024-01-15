@@ -89,3 +89,59 @@
 ;;     {:Value "2", :Next 3}
 ;;     {:Value "1", :Next 2}
 ;;     {:Value "0", :Next 1})
+
+;; simulating (aws/invoke)
+(defn gen-map
+  [n]
+  {:Value (str n)
+   :Next (cond 
+           (< n 5) (inc n)
+           :else nil)})
+
+(defn aws-invoke
+  [_ operation]
+  (if-let [next-token (-> operation :request :NextToken)]
+    (gen-map next-token)
+    (gen-map 0)))
+
+(defn describe-autoscaling-groups
+  ([client]
+   (describe-autoscaling-groups nil client))
+  ([next-token client]
+   (if (some? next-token) 
+     (aws-invoke client {:op :DescribeAutoScalingGroups
+                         :request {:NextToken next-token}})
+     (aws-invoke client {:op :DescribeAutoScalingGroups}))))
+
+(describe-autoscaling-groups nil)
+;; => {:Value "0", :Next 1}
+
+(describe-autoscaling-groups 1 nil)
+;; => {:Value "3", :Next 4}
+
+(describe-autoscaling-groups 5 nil)
+;; => {:Value "5", :Next nil}
+
+(defn lazy-describe-paginated-autoscaling-groups
+  ([]
+   (lazy-describe-paginated-autoscaling-groups nil))
+  ([next-token]
+   (let [response (describe-autoscaling-groups next-token nil)]
+     (cons response (lazy-seq (lazy-describe-paginated-autoscaling-groups (:Next response)))))))
+
+(take 3 (lazy-describe-paginated-autoscaling-groups))
+;; => ({:Value "0", :Next 1} {:Value "1", :Next 2} {:Value "2", :Next 3})
+
+(reduce #(let [acc (cons %2 %1)]
+           (if (some? (:Next %2))
+             acc
+             (reduced acc)))
+        []
+        (lazy-describe-paginated-autoscaling-groups))
+;; => ({:Value "5", :Next nil}
+;;     {:Value "4", :Next 5}
+;;     {:Value "3", :Next 4}
+;;     {:Value "2", :Next 3}
+;;     {:Value "1", :Next 2}
+;;     {:Value "0", :Next 1})
+

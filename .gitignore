@@ -19,5 +19,6 @@ vendor
 playground.clj
 .hgignore
 **/.clj-kondo/.cache
+.clj-kondo
 .lsp
 
